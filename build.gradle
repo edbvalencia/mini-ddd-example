@@ -1,0 +1,131 @@
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version '3.4.3'
+    id 'io.spring.dependency-management' version '1.1.7'
+}
+
+def NAME = 'dddtest'
+def VERSION = '0.0.1'
+
+def BASE_GROUP = 'com.alutarb'
+def JAVA_VERSION = 21
+
+//----------------------------------------
+//----------------------------------------
+allprojects {
+    apply plugin: 'java'
+    apply plugin: 'io.spring.dependency-management'
+    apply plugin: 'org.springframework.boot'
+
+    java {
+        toolchain {
+            languageVersion = JavaLanguageVersion.of(JAVA_VERSION)
+        }
+    }
+
+    repositories {
+        mavenCentral()
+    }
+
+    configurations {
+        compileOnly {
+            extendsFrom annotationProcessor
+        }
+    }
+
+    dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-amqp'
+        implementation 'org.springframework.boot:spring-boot-starter-web'
+        implementation 'org.reflections:reflections:0.10.2'
+        implementation 'com.aventrix.jnanoid:jnanoid:2.0.0'
+        implementation 'com.google.guava:guava:32.0.1-android'
+        implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+        compileOnly 'org.projectlombok:lombok'
+        annotationProcessor 'org.projectlombok:lombok'
+
+        testImplementation 'org.springframework.boot:spring-boot-starter-test'
+        testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+    }
+
+    test {
+        useJUnitPlatform()
+        testLogging {
+            events "passed", "skipped", "failed"
+        }
+    }
+
+    tasks.register('view_paths') {
+        doLast {
+            println "Project: ${project.name}"
+            println "-------------------------"
+            println "Main Source Directories: ${sourceSets.main.java.srcDirTrees.join(', ')}"
+            println "Main Resources Directories: ${sourceSets.main.resources.srcDirTrees.join(', ')}"
+            println "Test Source Directories: ${sourceSets.test.java.srcDirTrees.join(', ')}"
+            println "Test Resources Directories: ${sourceSets.test.resources.srcDirTrees.join(', ')}"
+        }
+    }
+}
+
+//----------------------------------------
+//----------------------------------------
+subprojects {
+    group = "${BASE_GROUP}.${rootProject.name}"
+
+    sourceSets {
+        main {
+            java { srcDirs = ['main'] }
+            resources { srcDirs = ['main/resources'] }
+        }
+
+        test {
+            java { srcDirs = ['test'] }
+            resources { srcDirs = ['test/resources'] }
+        }
+    }
+
+    dependencies {
+        testImplementation rootProject.sourceSets.main.output
+
+        if (project.name != "shared") {
+            implementation project(":shared")
+            testImplementation project(":shared").sourceSets.test.output
+        }
+    }
+
+    bootJar {
+        enabled = false
+    }
+
+    jar {
+        enabled = true
+    }
+}
+
+//----------------------------------------
+//----------------------------------------
+sourceSets {
+    main {
+        java { srcDirs = ['apps/main'] }
+        resources { srcDirs = ['apps/main/resources'] }
+    }
+
+    test {
+        java { srcDirs = ['apps/test'] }
+        resources { srcDirs = ['apps/test/resources'] }
+    }
+}
+
+bootJar {
+    archiveBaseName.set(NAME)
+    archiveVersion.set(VERSION)
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+dependencies {
+    implementation project(":shared")
+    implementation project(":backoffice")
+
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.4'
+    testImplementation project(":shared").sourceSets.test.output
+}

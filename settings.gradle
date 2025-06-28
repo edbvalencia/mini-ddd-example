@@ -1,0 +1,8 @@
+rootProject.name = 'dddtest'
+
+include ':shared'
+project(':shared').projectDir = new File('src/shared')
+
+include(':backoffice')
+project(':backoffice').projectDir = new File('src/backoffice')
+

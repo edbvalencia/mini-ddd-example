@@ -1,0 +1,27 @@
+server:
+  port: 8082
+  servlet:
+    context-path: /api
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
+
+spring:
+  application:
+    name: dddtest
+  servlet:
+    multipart:
+      max-file-size: 60MB
+      max-request-size: 60MB
+  profiles:
+    active: default
+    
+springdoc:
+  swagger-ui:
+    enabled: true
+    path: /swagger-ui
+    tags-sorter: alpha
+    display-request-duration: true
+    filter: true
+    deep-linking: true
