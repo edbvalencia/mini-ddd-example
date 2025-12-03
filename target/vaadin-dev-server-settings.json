@@ -1,0 +1,18 @@
+{
+  "frontendFolder": "/home/alutarb/mini-ddd-example/./src/main/frontend",
+  "themeFolder": "themes",
+  "themeResourceFolder": "/home/alutarb/mini-ddd-example/./src/main/frontend/generated/jar-resources",
+  "staticOutput": "/home/alutarb/mini-ddd-example/target/classes/META-INF/VAADIN/webapp/VAADIN/static",
+  "generatedFolder": "generated",
+  "statsOutput": "/home/alutarb/mini-ddd-example/target/classes/META-INF/VAADIN/config",
+  "frontendBundleOutput": "/home/alutarb/mini-ddd-example/target/classes/META-INF/VAADIN/webapp",
+  "devBundleOutput": "/home/alutarb/mini-ddd-example/target/dev-bundle/webapp",
+  "devBundleStatsOutput": "/home/alutarb/mini-ddd-example/target/dev-bundle/config",
+  "i18nOutput": "target/classes/vaadin-i18n",
+  "jarResourcesFolder": "/home/alutarb/mini-ddd-example/./src/main/frontend/generated/jar-resources",
+  "themeName": "",
+  "clientServiceWorkerSource": "/home/alutarb/mini-ddd-example/target/sw.ts",
+  "pwaEnabled": false,
+  "offlineEnabled": false,
+  "offlinePath": "'offline.html'"
+}

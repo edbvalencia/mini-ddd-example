@@ -1,12 +1,13 @@
 package com.alutarb.shared.infrastructure.bus.event.spring;
 
-import com.alutarb.shared.domain.bus.event.DomainEvent;
-import com.alutarb.shared.domain.bus.event.EventBus;
+import java.util.List;
+
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
+import com.alutarb.shared.domain.bus.event.DomainEvent;
+import com.alutarb.shared.domain.bus.event.EventBus;
 
 @Primary
 @Service

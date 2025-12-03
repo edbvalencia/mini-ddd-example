@@ -1,11 +1,10 @@
 package com.alutarb.shared.domain.bus.event;
 
-import com.alutarb.shared.domain.Utils;
-import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
-
 import java.io.Serializable;
-import java.time.LocalDateTime;
+import java.time.Instant;
 import java.util.HashMap;
+
+import com.aventrix.jnanoid.jnanoid.NanoIdUtils;
 
 public abstract class DomainEvent {
 
@@ -22,7 +21,7 @@ public abstract class DomainEvent {
     public DomainEvent(String aggregateId) {
         this.aggregateId = aggregateId;
         this.eventId = NanoIdUtils.randomNanoId();
-        this.occurredOn = Utils.dateToString(LocalDateTime.now());
+        this.occurredOn = Instant.now().toString();
     }
 
     public DomainEvent(String aggregateId, String eventId, String occurredOn) {
@@ -36,10 +35,10 @@ public abstract class DomainEvent {
     public abstract HashMap<String, Serializable> toPrimitives();
 
     public abstract DomainEvent fromPrimitives(
-            String aggregateId,
-            HashMap<String, Serializable> body,
-            String eventId,
-            String occurredOn
+        String aggregateId,
+        HashMap<String, Serializable> body,
+        String eventId,
+        String occurredOn
     );
 
     public String aggregateId() {

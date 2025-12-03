@@ -1,10 +1,10 @@
 package com.alutarb.shared.domain;
 
-import com.alutarb.shared.domain.bus.event.DomainEvent;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.util.ArrayList;
 import java.util.List;
+
+import com.alutarb.shared.domain.bus.event.DomainEvent;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public abstract class AggregateRoot {
 
@@ -15,11 +15,12 @@ public abstract class AggregateRoot {
         List<DomainEvent> events = domainEvents;
 
         domainEvents = new ArrayList<>();
-        
+
         return events;
     }
 
     final protected void record(DomainEvent event) {
         domainEvents.add(event);
     }
+
 }

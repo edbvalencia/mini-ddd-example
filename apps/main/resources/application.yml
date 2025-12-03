@@ -1,22 +1,43 @@
 server:
-  port: 8082
+  port: ${SERVER_PORT}
   servlet:
-    context-path: /api
-    encoding:
-      charset: UTF-8
-      enabled: true
-      force: true
+    context-path: ${SERVER_CONTEXT_PATH}
 
 spring:
   application:
-    name: dddtest
-  servlet:
-    multipart:
-      max-file-size: 60MB
-      max-request-size: 60MB
-  profiles:
-    active: default
-    
+    name: ${SPRING_APPLICATION_NAME}
+
+  ai:
+    vectorstore:
+      qdrant:
+        host: ${QDRANT_HOST}
+        port: ${QDRANT_PORT}
+        use-tls: ${QDRANT_USE_TLS}
+    ollama:
+      base-url: ${OLLAMA_BASE_URL}
+      embedding:
+        model: ${OLLAMA_EMBEDDING_MODEL}
+      chat:
+        options:
+          model: ${OLLAMA_CHAT_MODEL}
+
+  data:
+    mongodb:
+      uri: ${MONGODB_URI}
+
+  datasource:
+    url: ${POSTGRES_URL}
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    driverClassName: ${POSTGRES_DRIVER}
+    hikari:
+      maximum-pool-size: ${POSTGRES_HIKARI_MAX_POOL}
+      minimum-idle: ${POSTGRES_HIKARI_MIN_IDLE}
+      connection-timeout: ${POSTGRES_HIKARI_CONN_TIMEOUT}
+
+vaadin:
+  launch-browser: false
+
 springdoc:
   swagger-ui:
     enabled: true
