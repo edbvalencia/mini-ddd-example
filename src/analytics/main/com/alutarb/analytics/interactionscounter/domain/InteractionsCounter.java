@@ -12,8 +12,14 @@ public class InteractionsCounter {
     private int viewsCount;
     private int commentsCount;
 
-    public InteractionsCounter(String id, List<String> publicationsIds, int likesCount, int sharesCount, int viewsCount,
-        int commentsCount) {
+    public InteractionsCounter(
+        String id,
+        List<String> publicationsIds,
+        int likesCount,
+        int sharesCount,
+        int viewsCount,
+        int commentsCount
+    ) {
         this.id = id;
         this.publicationsIds = publicationsIds;
         this.likesCount = likesCount;
@@ -26,7 +32,13 @@ public class InteractionsCounter {
         return new InteractionsCounter(id, new ArrayList<>(), 0, 0, 0, 0);
     }
 
-    public void increment(String publicationId, int likesCount, int sharesCount, int viewsCount, int commentsCount) {
+    public void increment(
+        String publicationId,
+        int likesCount,
+        int sharesCount,
+        int viewsCount,
+        int commentsCount
+    ) {
         this.publicationsIds.add(publicationId);
         this.likesCount += likesCount;
         this.sharesCount += sharesCount;

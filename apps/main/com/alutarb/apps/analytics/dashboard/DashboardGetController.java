@@ -25,34 +25,31 @@ public class DashboardGetController {
         var sentiments = sentimentCounterSearcher.search(Constants.ID);
 
         var interactionsChart = new InteractionsChartResponse(interactions.likesCount(), interactions.sharesCount(),
-            interactions.commentsCount(), interactions.viewsCount());
+                interactions.commentsCount(), interactions.viewsCount());
 
         var sentimentChart = new SentimentChartResponse(sentiments.positiveCount(), sentiments.negativeCount(),
-            sentiments.neutralCount());
+                sentiments.neutralCount());
 
         return new DashboardResponse(publications.count(), interactionsChart, sentimentChart);
     }
 
     public record SentimentChartResponse(
-        int positive,
-        int negative,
-        int neutral
-    ) {
+            int positive,
+            int negative,
+            int neutral) {
     }
 
     public record DashboardResponse(
-        long publications,
-        InteractionsChartResponse interactionsChart,
-        SentimentChartResponse sentimentChart
-    ) {
+            long publications,
+            InteractionsChartResponse interactionsChart,
+            SentimentChartResponse sentimentChart) {
     }
 
     public record InteractionsChartResponse(
-        int likes,
-        int shares,
-        int comments,
-        int views
-    ) {
+            int likes,
+            int shares,
+            int comments,
+            int views) {
     }
 
 }

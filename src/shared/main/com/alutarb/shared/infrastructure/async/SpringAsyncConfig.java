@@ -13,8 +13,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class SpringAsyncConfig implements WebMvcConfigurer {
 
     @Primary
-    @Bean(name = "taskExecutor")
-    public ThreadPoolTaskExecutor taskExecutor() {
+    @Bean(name = "segmentationExecutor")
+    public ThreadPoolTaskExecutor segmentationExecutor() {
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
 
         executor.setCorePoolSize(8);
@@ -31,8 +31,8 @@ public class SpringAsyncConfig implements WebMvcConfigurer {
 
     @Override
     public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
-        configurer.setTaskExecutor(taskExecutor());
+        configurer.setTaskExecutor(segmentationExecutor());
         configurer.setDefaultTimeout(0);
     }
-    
+
 }

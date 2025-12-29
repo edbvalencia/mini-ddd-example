@@ -54,8 +54,8 @@ public class PublicationSyncronizerController {
                     r.emojis(),
                     r.concepts(),
                     r.verbs(),
-                    r.createdAt()
-                )).toList();
+                    r.createdAt()))
+                .toList();
 
             publicationCreator.create(commands);
 

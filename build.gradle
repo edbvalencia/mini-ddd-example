@@ -103,10 +103,13 @@ subprojects {
     }
 
     dependencies {
+        implementation 'org.springframework.boot:spring-boot-starter-data-mongodb'
+
         implementation 'org.springframework.boot:spring-boot-starter-jdbc'
         runtimeOnly 'org.postgresql:postgresql' 
+        
         testImplementation rootProject.sourceSets.main.output
-
+ 
         if (project.name != "shared") {
             implementation project(":shared")
             testImplementation project(":shared").sourceSets.test.output

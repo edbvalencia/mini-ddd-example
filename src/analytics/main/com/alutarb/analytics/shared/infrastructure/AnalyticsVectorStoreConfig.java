@@ -28,6 +28,11 @@ public class AnalyticsVectorStoreConfig {
         return buildVectorStore(qdrantClient, embeddingModel, "analyticspublication-v2");
     }
 
+    @Bean("segmentationpublication")
+    public VectorStore segmentationPublicationVectorStore(QdrantClient qdrantClient, EmbeddingModel embeddingModel) {
+        return buildVectorStore(qdrantClient, embeddingModel, "segmentationpublication");
+    }
+
     private VectorStore buildVectorStore(QdrantClient client, EmbeddingModel embeddingModel, String name) {
         return QdrantVectorStore.builder(client, embeddingModel)
             .collectionName(name)
