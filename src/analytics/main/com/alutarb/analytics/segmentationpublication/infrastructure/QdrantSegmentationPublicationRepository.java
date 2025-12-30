@@ -8,24 +8,20 @@ import java.util.Map;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Component;
 
 import com.alutarb.analytics.segmentationpublication.domain.SegmentationPublication;
-import com.alutarb.analytics.segmentationpublication.domain.SegmentationPublicationRepository;
 import com.alutarb.analytics.shared.infrastructure.VectorStoreUtils;
 
-@Repository
-public class QdrantSegmentationPublicationRepository implements SegmentationPublicationRepository {
+import lombok.RequiredArgsConstructor;
+
+@Component
+@RequiredArgsConstructor
+public class QdrantSegmentationPublicationRepository {
 
     private static final int MAX_TEXT_CHARS = 2000;
     private final VectorStore vectorStore;
 
-    public QdrantSegmentationPublicationRepository(@Qualifier("segmentationpublication") VectorStore vectorStore) {
-        this.vectorStore = vectorStore;
-    }
-
-    @Override
     public void save(SegmentationPublication publication) {
         try {
             vectorStore.add(List.of(toDocument(publication)));
@@ -34,30 +30,14 @@ public class QdrantSegmentationPublicationRepository implements SegmentationPubl
         }
     }
 
-    @Override
-    public void save(List<SegmentationPublication> publications) {
-        try {
-            var documents = publications.stream().map(this::toDocument).toList();
-            vectorStore.add(documents);
-        } catch (Exception e) {
-            throw new RuntimeException("error saving segmentation publications to vector store", e);
-        }
-    }
-
-    @Override
-    public List<SegmentationPublication> searchByQuery(String query, int limit) {
+    public List<String> searchIdsByQuery(String query, int limit) {
         var request = SearchRequest.builder()
             .query(query)
             .topK(limit)
             .build();
         return vectorStore.similaritySearch(request).stream()
-            .map(this::toPublication)
+            .map(document -> (String) document.getMetadata().get("id"))
             .toList();
-    }
-
-    @Override
-    public void deleteAll() {
-        vectorStore.delete("true");
     }
 
     private Document toDocument(SegmentationPublication publication) {
@@ -70,78 +50,9 @@ public class QdrantSegmentationPublicationRepository implements SegmentationPubl
 
     private Map<String, Object> toMetadataEmbedding(SegmentationPublication publication) {
         Map<String, Object> metadata = new HashMap<>();
-
         put(metadata, "id", publication.id());
-        put(metadata, "audience", publication.audience());
-        put(metadata, "avatar", publication.avatar());
-        put(metadata, "comments", publication.comments());
         put(metadata, "createdAt", toString(publication.createdAt()));
-        put(metadata, "dataType", publication.dataType());
-        put(metadata, "impactLevel", publication.impactLevel());
-        put(metadata, "interactions", publication.interactions());
-        put(metadata, "itemType", publication.itemType());
-        put(metadata, "link", publication.link());
-        put(metadata, "media", publication.media());
-        put(metadata, "network", publication.network());
-        put(metadata, "page", publication.page());
-        put(metadata, "platform", publication.platform());
-        put(metadata, "reachLevel", publication.reachLevel());
-        put(metadata, "reactions", publication.reactions());
-        put(metadata, "registeredAt", toString(publication.registeredAt()));
-        put(metadata, "shares", publication.shares());
-        put(metadata, "text", safeText(publication.text()));
-        put(metadata, "bigFive", publication.bigFive());
-        put(metadata, "cleanText", publication.cleanText());
-        put(metadata, "color", publication.color());
-        put(metadata, "emotion", publication.emotion());
-        put(metadata, "gobColor", publication.gobColor());
-        put(metadata, "isValid", publication.isValid());
-        put(metadata, "municipality", publication.municipality());
-        put(metadata, "subtopic", publication.subtopic());
-        put(metadata, "summary", publication.summary());
-        put(metadata, "title", publication.title());
-        put(metadata, "topic", publication.topic());
-        put(metadata, "validText", publication.validText());
-
         return metadata;
-    }
-
-    private SegmentationPublication toPublication(Document document) {
-        var metadata = document.getMetadata();
-
-        return new SegmentationPublication(
-            (String) metadata.get("id"),
-            toLong(metadata.get("audience")),
-            (String) metadata.get("avatar"),
-            toLong(metadata.get("comments")),
-            parseInstant(metadata.get("createdAt")),
-            (String) metadata.get("dataType"),
-            (String) metadata.get("impactLevel"),
-            toLong(metadata.get("interactions")),
-            (String) metadata.get("itemType"),
-            (String) metadata.get("link"),
-            (String) metadata.get("media"),
-            (String) metadata.get("network"),
-            (String) metadata.get("page"),
-            (String) metadata.get("platform"),
-            (String) metadata.get("reachLevel"),
-            toLong(metadata.get("reactions")),
-            parseInstant(metadata.get("registeredAt")),
-            toLong(metadata.get("shares")),
-            (String) metadata.get("text"),
-            (Map<String, Object>) metadata.get("bigFive"),
-            (String) metadata.get("cleanText"),
-            (String) metadata.get("color"),
-            (String) metadata.get("emotion"),
-            (String) metadata.get("gobColor"),
-            (Boolean) metadata.get("isValid"),
-            (String) metadata.get("municipality"),
-            (String) metadata.get("subtopic"),
-            (String) metadata.get("summary"),
-            (String) metadata.get("title"),
-            (String) metadata.get("topic"),
-            (Boolean) metadata.get("validText")
-        );
     }
 
     private void put(Map<String, Object> map, String key, Object value) {

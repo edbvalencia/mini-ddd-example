@@ -1,0 +1,19 @@
+version: "3.8"
+
+services:
+  searcher-api:
+    image: "registry.gitlab.com/golden-gd/servers-files/${APP_NAME}:${APP_VERSION}"
+    restart: unless-stopped
+    container_name: "${APP_NAME}"
+    environment:
+      - "SPRING_PROFILES_ACTIVE=${APP_ENV}"
+    ports:
+      - "8082:8082"
+      - "8111:8111"
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+    logging:
+      options:
+        max-size: 10m

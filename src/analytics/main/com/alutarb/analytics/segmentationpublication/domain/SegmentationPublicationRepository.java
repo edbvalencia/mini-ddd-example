@@ -8,7 +8,4 @@ public interface SegmentationPublicationRepository {
 
     void save(SegmentationPublication publication);
 
-    void save(List<SegmentationPublication> publications);
-
-    void deleteAll();
 }
