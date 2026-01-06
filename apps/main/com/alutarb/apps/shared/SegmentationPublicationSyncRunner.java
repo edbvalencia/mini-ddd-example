@@ -1,14 +1,16 @@
 package com.alutarb.apps.shared;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import com.alutarb.analytics.segmentationpublication.application.CreateSegmentationPublicationCommand;
-import com.alutarb.analytics.segmentationpublication.application.SegmentationPublicationCreator;
+import com.alutarb.analytics.segmentationpublication.application.create.CreateSegmentationPublicationCommand;
+import com.alutarb.analytics.segmentationpublication.application.create.SegmentationPublicationCreator;
 import com.alutarb.analytics.shared.domain.RawMention;
 import com.alutarb.analytics.shared.infrastructure.RawSegmentationPublicationSearcher;
+import com.alutarb.shared.domain.SocialNetwork;
 
 import lombok.RequiredArgsConstructor;
 
@@ -20,7 +22,7 @@ public class SegmentationPublicationSyncRunner {
     private final SegmentationPublicationCreator segmentationPublicationCreator;
 
     @Async("segmentationExecutor")
-    public void runAsync(int total, int batchSize) {
+    public CompletableFuture<Void> runAsync(int total, int batchSize) {
 
         long totalStart = System.currentTimeMillis();
 
@@ -49,40 +51,18 @@ public class SegmentationPublicationSyncRunner {
                 .map(r -> new CreateSegmentationPublicationCommand(
                     r.id(),
                     r.audience(),
-                    r.avatar(),
                     r.comments(),
-                    r.createdAt(),
-                    r.dataType(),
-                    r.impactLevel(),
                     r.interactions(),
-                    r.itemType(),
-                    r.link(),
-                    r.media(),
-                    r.network(),
-                    r.page(),
-                    r.platform(),
-                    r.reachLevel(),
                     r.reactions(),
-                    r.registeredAt(),
                     r.shares(),
+                    SocialNetwork.fromString(r.network()),
                     r.text(),
-                    r.bigFive(),
-                    r.cleanText(),
-                    r.color(),
-                    r.emotion(),
-                    r.gobColor(),
-                    r.isValid(),
-                    r.municipality(),
-                    r.subtopic(),
-                    r.summary(),
-                    r.title(),
-                    r.topic(),
-                    r.validText()
+                    r.createdAt()
                 ))
                 .toList();
 
             long saveStart = System.currentTimeMillis();
-            segmentationPublicationCreator.create(commands);
+            commands.forEach(segmentationPublicationCreator::create);
             long saveEnd = System.currentTimeMillis();
             totalSaveTime += (saveEnd - saveStart);
 
@@ -110,6 +90,36 @@ public class SegmentationPublicationSyncRunner {
         System.out.println("fetch total(ms): " + totalSearchTime);
         System.out.println("save total(ms): " + totalSaveTime);
         System.out.println("total(ms): " + (totalEnd - totalStart));
+
+        return CompletableFuture.completedFuture(null);
+    }
+
+    @Async("segmentationExecutor")
+    public CompletableFuture<Void> syncLatestAsync() {
+        long totalStart = System.currentTimeMillis();
+
+        List<RawMention> records = rawSearcher.search(0, 10000);
+
+        var commands = records.stream()
+            .map(r -> new CreateSegmentationPublicationCommand(
+                r.id(),
+                r.audience(),
+                r.comments(),
+                r.interactions(),
+                r.reactions(),
+                r.shares(),
+                SocialNetwork.fromString(r.network()),
+                r.text(),
+                r.createdAt()
+            ))
+            .toList();
+
+        commands.forEach(segmentationPublicationCreator::create);
+
+        long totalEnd = System.currentTimeMillis();
+        System.out.println("[SYNC-LATEST] saved=" + records.size() + " total(ms)=" + (totalEnd - totalStart));
+
+        return CompletableFuture.completedFuture(null);
     }
 
 }

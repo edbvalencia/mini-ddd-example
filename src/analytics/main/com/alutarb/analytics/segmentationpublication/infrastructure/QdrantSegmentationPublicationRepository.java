@@ -8,19 +8,21 @@ import java.util.Map;
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
 import org.springframework.ai.vectorstore.VectorStore;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.alutarb.analytics.segmentationpublication.domain.SegmentationPublication;
 import com.alutarb.analytics.shared.infrastructure.VectorStoreUtils;
 
-import lombok.RequiredArgsConstructor;
-
 @Component
-@RequiredArgsConstructor
 public class QdrantSegmentationPublicationRepository {
 
     private static final int MAX_TEXT_CHARS = 2000;
     private final VectorStore vectorStore;
+
+    public QdrantSegmentationPublicationRepository(@Qualifier("segmentationpublication") VectorStore vectorStore) {
+        this.vectorStore = vectorStore;
+    }
 
     public void save(SegmentationPublication publication) {
         try {
@@ -31,10 +33,21 @@ public class QdrantSegmentationPublicationRepository {
     }
 
     public List<String> searchIdsByQuery(String query, int limit) {
-        var request = SearchRequest.builder()
+        return searchIdsByQuery(query, limit, null, null);
+    }
+
+    public List<String> searchIdsByQuery(String query, int limit, Instant createdAtFrom, Instant createdAtTo) {
+        var builder = SearchRequest.builder()
             .query(query)
-            .topK(limit)
-            .build();
+            .topK(limit);
+
+        String filterExpression = buildCreatedAtFilterExpression(createdAtFrom, createdAtTo);
+        if (filterExpression != null) {
+            builder.filterExpression(filterExpression);
+        }
+
+        var request = builder.build();
+
         return vectorStore.similaritySearch(request).stream()
             .map(document -> (String) document.getMetadata().get("id"))
             .toList();
@@ -52,6 +65,7 @@ public class QdrantSegmentationPublicationRepository {
         Map<String, Object> metadata = new HashMap<>();
         put(metadata, "id", publication.id());
         put(metadata, "createdAt", toString(publication.createdAt()));
+        put(metadata, "createdAtEpochMs", toEpochMillis(publication.createdAt()));
         return metadata;
     }
 
@@ -79,9 +93,33 @@ public class QdrantSegmentationPublicationRepository {
         return value != null ? value.toString() : null;
     }
 
+    private Long toEpochMillis(Instant value) {
+        return value != null ? value.toEpochMilli() : null;
+    }
+
+    private String buildCreatedAtFilterExpression(Instant createdAtFrom, Instant createdAtTo) {
+        Long fromMs = toEpochMillis(createdAtFrom);
+        Long toMs = toEpochMillis(createdAtTo);
+
+        if (fromMs == null && toMs == null) {
+            return null;
+        }
+
+        if (fromMs != null && toMs != null) {
+            return "createdAtEpochMs >= " + fromMs + " && createdAtEpochMs <= " + toMs;
+        }
+
+        if (fromMs != null) {
+            return "createdAtEpochMs >= " + fromMs;
+        }
+
+        return "createdAtEpochMs <= " + toMs;
+    }
+
     private String safeText(String text) {
         if (text == null) return "";
         if (text.length() <= MAX_TEXT_CHARS) return text;
         return text.substring(0, MAX_TEXT_CHARS);
     }
+
 }

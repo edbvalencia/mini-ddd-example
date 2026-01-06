@@ -6,7 +6,7 @@ import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.ai.chat.prompt.ChatOptions;
 import org.springframework.stereotype.Service;
 
-import com.alutarb.analytics.publication.application.search.PublicationSearcher;
+import com.alutarb.analytics.segmentationpublication.application.search.SegmentationPublicationSearcher;
 
 import lombok.RequiredArgsConstructor;
 
@@ -15,13 +15,13 @@ import lombok.RequiredArgsConstructor;
 public class PublicationsQuestionAnswerer {
 
     private final ChatClient client;
-    private final PublicationSearcher searcher;
+    private final SegmentationPublicationSearcher searcher;
 
     public ChatResponse ask(String question) {
 
-        var results = searcher.searchByQuery(question, 10);
+        var results = searcher.searchByQueryWithStats(question, 50);
 
-        var context = results.stream()
+        var context = results.publications().stream()
             .map(r -> r.text())
             .collect(Collectors.joining("\n\n"));
 

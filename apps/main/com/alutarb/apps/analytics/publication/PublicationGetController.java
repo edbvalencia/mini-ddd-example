@@ -1,15 +1,13 @@
 package com.alutarb.apps.analytics.publication;
 
-import java.util.List;
+import java.time.Instant;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.alutarb.analytics.publication.application.search.PublicationResponse;
-import com.alutarb.analytics.publication.application.search.PublicationSearcher;
-import com.alutarb.analytics.shared.domain.RawMention;
-import com.alutarb.analytics.shared.infrastructure.RawSegmentationPublicationSearcher;
+import com.alutarb.analytics.segmentationpublication.application.search.SegmentationPublicationSearcher;
+import com.alutarb.analytics.segmentationpublication.application.search.SegmentationPublicationsResponse;
 
 import lombok.RequiredArgsConstructor;
 
@@ -17,21 +15,16 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class PublicationGetController {
 
-    private final PublicationSearcher searcher;
-    private final RawSegmentationPublicationSearcher segmentationSearcher;
-
-    @GetMapping("/publications")
-    public List<PublicationResponse> search(@RequestParam String query, @RequestParam(defaultValue = "10") int size) {
-        return searcher.searchByQuery(query, size);
-    }
+    private final SegmentationPublicationSearcher segmentationSearcher;
 
     @GetMapping("/segmentation-publications")
-    public List<RawMention> search(
-        @RequestParam(defaultValue = "0") int page,
-        @RequestParam(defaultValue = "10") int size
+    public SegmentationPublicationsResponse search(
+        @RequestParam String query,
+        @RequestParam(defaultValue = "10") int size,
+        @RequestParam(required = false) Instant from,
+        @RequestParam(required = false) Instant to
     ) {
-        var results = segmentationSearcher.search(page, size);
-        return results;
+        return segmentationSearcher.searchByQueryWithStats(query, size, from, to);
     }
 
 }

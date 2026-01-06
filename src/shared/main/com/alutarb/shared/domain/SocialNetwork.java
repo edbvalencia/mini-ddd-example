@@ -9,4 +9,12 @@ public enum SocialNetwork {
     TWITCH,
     TWITTER,
     YOUTUBE;
+
+    public static SocialNetwork fromString(String name) {
+        if ("X".equalsIgnoreCase(name)) {
+            return TWITTER;
+        }
+        return SocialNetwork.valueOf(name.toUpperCase());
+    }
+
 }

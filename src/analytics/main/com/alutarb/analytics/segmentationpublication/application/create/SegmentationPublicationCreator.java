@@ -1,4 +1,4 @@
-package com.alutarb.analytics.segmentationpublication.application;
+package com.alutarb.analytics.segmentationpublication.application.create;
 
 import org.springframework.stereotype.Service;
 

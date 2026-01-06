@@ -24,6 +24,8 @@ spring:
   data:
     mongodb:
       uri: ${MONGODB_URI}
+      segmentation:
+        uri: ${SEGMENTATION_MONGODB_URI}
 
   datasource:
     url: ${POSTGRES_URL}
@@ -34,9 +36,6 @@ spring:
       maximum-pool-size: ${POSTGRES_HIKARI_MAX_POOL}
       minimum-idle: ${POSTGRES_HIKARI_MIN_IDLE}
       connection-timeout: ${POSTGRES_HIKARI_CONN_TIMEOUT}
-
-vaadin:
-  launch-browser: false
 
 springdoc:
   swagger-ui:
