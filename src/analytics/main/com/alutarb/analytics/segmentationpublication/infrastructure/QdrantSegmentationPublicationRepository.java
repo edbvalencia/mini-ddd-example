@@ -1,6 +1,7 @@
 package com.alutarb.analytics.segmentationpublication.infrastructure;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -16,6 +17,9 @@ import com.alutarb.analytics.shared.infrastructure.VectorStoreUtils;
 
 @Component
 public class QdrantSegmentationPublicationRepository {
+
+    public record SearchResult(String id, List<Double> embedding) {
+    }
 
     private static final int MAX_TEXT_CHARS = 2000;
     private final VectorStore vectorStore;
@@ -51,6 +55,44 @@ public class QdrantSegmentationPublicationRepository {
         return vectorStore.similaritySearch(request).stream()
             .map(document -> (String) document.getMetadata().get("id"))
             .toList();
+    }
+
+    public Map<String, List<Double>> searchWithEmbeddings(String query, int limit, Instant createdAtFrom,
+        Instant createdAtTo) {
+        var builder = SearchRequest.builder()
+            .query(query)
+            .topK(limit);
+
+        String filterExpression = buildCreatedAtFilterExpression(createdAtFrom, createdAtTo);
+        if (filterExpression != null) {
+            builder.filterExpression(filterExpression);
+        }
+
+        var request = builder.build();
+        var documents = vectorStore.similaritySearch(request);
+
+        Map<String, List<Double>> embeddingsById = new java.util.LinkedHashMap<>();
+        for (var doc : documents) {
+            String id = (String) doc.getMetadata().get("id");
+            if (id != null) {
+                try {
+                    Object embeddingObj = doc.getMetadata().get("embedding");
+                    if (embeddingObj instanceof List<?> embList) {
+                        List<Double> embedding = new ArrayList<>();
+                        for (Object obj : embList) {
+                            if (obj instanceof Number num) {
+                                embedding.add(num.doubleValue());
+                            }
+                        }
+                        if (!embedding.isEmpty()) {
+                            embeddingsById.put(id, embedding);
+                        }
+                    }
+                } catch (Exception e) {
+                }
+            }
+        }
+        return embeddingsById;
     }
 
     private Document toDocument(SegmentationPublication publication) {

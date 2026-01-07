@@ -57,7 +57,8 @@ public class SegmentationPublicationSyncRunner {
                     r.shares(),
                     SocialNetwork.fromString(r.network()),
                     r.text(),
-                    r.createdAt()
+                    r.createdAt(),
+                    null
                 ))
                 .toList();
 
@@ -110,7 +111,8 @@ public class SegmentationPublicationSyncRunner {
                 r.shares(),
                 SocialNetwork.fromString(r.network()),
                 r.text(),
-                r.createdAt()
+                r.createdAt(),
+                null
             ))
             .toList();
 

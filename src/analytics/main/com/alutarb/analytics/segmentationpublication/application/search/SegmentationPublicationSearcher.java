@@ -33,16 +33,7 @@ public class SegmentationPublicationSearcher {
         Instant createdAtTo) {
         var result = repository.searchByQueryWithStats(query, limit, createdAtFrom, createdAtTo);
         var publications = result.publications().stream().map(SegmentationPublicationResponse::of).toList();
-        var stats = result.stats();
-        return new SegmentationPublicationsResponse(
-            publications,
-            stats.audience(),
-            stats.comments(),
-            stats.interactions(),
-            stats.reactions(),
-            stats.shares(),
-            stats.publicationsCount()
-        );
+        return new SegmentationPublicationsResponse(publications);
     }
 
 }

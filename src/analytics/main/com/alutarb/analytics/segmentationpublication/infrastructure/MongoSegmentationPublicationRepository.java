@@ -7,7 +7,6 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.bson.Document;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -20,19 +19,14 @@ import com.alutarb.analytics.segmentationpublication.domain.SegmentationPublicat
 import com.alutarb.analytics.segmentationpublication.domain.SegmentationPublicationRepository;
 import com.alutarb.analytics.segmentationpublication.domain.SegmentationPublicationSearchResult;
 
+import lombok.RequiredArgsConstructor;
+
 @Repository
+@RequiredArgsConstructor
 public class MongoSegmentationPublicationRepository implements SegmentationPublicationRepository {
 
     private final MongoTemplate template;
     private final QdrantSegmentationPublicationRepository qdrantRepository;
-
-    public MongoSegmentationPublicationRepository(
-        @Qualifier("segmentationMongoTemplate") MongoTemplate template,
-        QdrantSegmentationPublicationRepository qdrantRepository
-    ) {
-        this.template = template;
-        this.qdrantRepository = qdrantRepository;
-    }
 
     @Override
     public List<SegmentationPublication> searchByQuery(String query, int limit) {
@@ -40,25 +34,40 @@ public class MongoSegmentationPublicationRepository implements SegmentationPubli
     }
 
     @Override
-    public List<SegmentationPublication> searchByQuery(String query, int limit, Instant createdAtFrom,
-        Instant createdAtTo) {
-        var ids = qdrantRepository.searchIdsByQuery(query, limit, createdAtFrom, createdAtTo);
+    public List<SegmentationPublication> searchByQuery(
+        String query,
+        int limit,
+        Instant createdAtFrom,
+        Instant createdAtTo
+    ) {
+        var embeddingsById = qdrantRepository.searchWithEmbeddings(query, limit, createdAtFrom, createdAtTo);
+        if (embeddingsById.isEmpty()) return List.of();
 
-        if (ids.isEmpty()) {
-            return List.of();
-        }
-
-        var mongoQuery = new Query(
-            Criteria.where("_id").in(ids)
-        );
-
+        var ids = List.copyOf(embeddingsById.keySet());
+        var mongoQuery = new Query(Criteria.where("_id").in(ids));
         var publications = template.find(mongoQuery, SegmentationPublication.class);
 
         Map<String, SegmentationPublication> byId = publications.stream()
             .collect(Collectors.toMap(SegmentationPublication::id, Function.identity()));
 
         return ids.stream()
-            .map(byId::get)
+            .map(id -> {
+                var pub = byId.get(id);
+                if (pub == null) return null;
+                var embedding = embeddingsById.get(id);
+                return new SegmentationPublication(
+                    pub.id(),
+                    pub.audience(),
+                    pub.comments(),
+                    pub.interactions(),
+                    pub.reactions(),
+                    pub.shares(),
+                    pub.socialNetwork(),
+                    pub.text(),
+                    pub.createdAt(),
+                    embedding
+                );
+            })
             .filter(p -> p != null)
             .toList();
     }
@@ -71,12 +80,13 @@ public class MongoSegmentationPublicationRepository implements SegmentationPubli
     @Override
     public SegmentationPublicationSearchResult searchByQueryWithStats(String query, int limit, Instant createdAtFrom,
         Instant createdAtTo) {
-        var ids = qdrantRepository.searchIdsByQuery(query, limit, createdAtFrom, createdAtTo);
+        var embeddingsById = qdrantRepository.searchWithEmbeddings(query, limit, createdAtFrom, createdAtTo);
 
-        if (ids.isEmpty()) {
+        if (embeddingsById.isEmpty()) {
             return new SegmentationPublicationSearchResult(List.of(), SegmentationPublicationQueryStats.empty());
         }
 
+        var ids = List.copyOf(embeddingsById.keySet());
         var matchStage = Aggregation.match(Criteria.where("_id").in(ids));
 
         var aggregation = Aggregation.newAggregation(
@@ -113,7 +123,23 @@ public class MongoSegmentationPublicationRepository implements SegmentationPubli
             .collect(Collectors.toMap(SegmentationPublication::id, Function.identity()));
 
         List<SegmentationPublication> ordered = ids.stream()
-            .map(byId::get)
+            .map(id -> {
+                var pub = byId.get(id);
+                if (pub == null) return null;
+                var embedding = embeddingsById.get(id);
+                return new SegmentationPublication(
+                    pub.id(),
+                    pub.audience(),
+                    pub.comments(),
+                    pub.interactions(),
+                    pub.reactions(),
+                    pub.shares(),
+                    pub.socialNetwork(),
+                    pub.text(),
+                    pub.createdAt(),
+                    embedding
+                );
+            })
             .filter(p -> p != null)
             .toList();
 

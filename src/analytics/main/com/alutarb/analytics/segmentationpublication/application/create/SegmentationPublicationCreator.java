@@ -25,7 +25,8 @@ public class SegmentationPublicationCreator {
             command.shares(),
             command.socialNetwork(),
             command.text(),
-            command.createdAt()
+            command.createdAt(),
+            command.embedding()
         );
         repository.save(publication);
         eventBus.publish(publication.pullDomainEvents());

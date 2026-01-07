@@ -1,6 +1,7 @@
 package com.alutarb.analytics.segmentationpublication.domain;
 
 import java.time.Instant;
+import java.util.List;
 
 import com.alutarb.shared.domain.AggregateRoot;
 import com.alutarb.shared.domain.SocialNetwork;
@@ -16,6 +17,7 @@ public class SegmentationPublication extends AggregateRoot {
     private SocialNetwork socialNetwork;
     private String text;
     private Instant createdAt;
+    private List<Double> embedding;
 
     public SegmentationPublication(
         String id,
@@ -26,7 +28,8 @@ public class SegmentationPublication extends AggregateRoot {
         Long shares,
         SocialNetwork socialNetwork,
         String text,
-        Instant createdAt
+        Instant createdAt,
+        List<Double> embedding
     ) {
         this.id = id;
         this.audience = audience;
@@ -37,6 +40,7 @@ public class SegmentationPublication extends AggregateRoot {
         this.socialNetwork = socialNetwork;
         this.text = text;
         this.createdAt = createdAt;
+        this.embedding = embedding;
     }
 
     public static SegmentationPublication create(
@@ -48,7 +52,8 @@ public class SegmentationPublication extends AggregateRoot {
         Long shares,
         SocialNetwork socialNetwork,
         String text,
-        Instant createdAt
+        Instant createdAt,
+        List<Double> embedding
     ) {
         return new SegmentationPublication(
             id,
@@ -59,7 +64,8 @@ public class SegmentationPublication extends AggregateRoot {
             shares,
             socialNetwork,
             text,
-            createdAt
+            createdAt,
+            embedding
         );
     }
 
@@ -97,6 +103,10 @@ public class SegmentationPublication extends AggregateRoot {
 
     public Instant createdAt() {
         return createdAt;
+    }
+
+    public List<Double> embedding() {
+        return embedding;
     }
 
 }

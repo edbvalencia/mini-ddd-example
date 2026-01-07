@@ -1,6 +1,7 @@
 package com.alutarb.analytics.segmentationpublication.application.create;
 
 import java.time.Instant;
+import java.util.List;
 
 import com.alutarb.shared.domain.SocialNetwork;
 
@@ -13,6 +14,7 @@ public record CreateSegmentationPublicationCommand(
     Long shares,
     SocialNetwork socialNetwork,
     String text,
-    Instant createdAt
+    Instant createdAt,
+    List<Double> embedding
 ) {
 }
