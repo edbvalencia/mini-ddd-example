@@ -58,7 +58,9 @@ public class SegmentationPublicationSyncRunner {
                     SocialNetwork.fromString(r.network()),
                     r.text(),
                     r.createdAt(),
-                    null
+                    null,
+                    r.color(),
+                    r.emotion()
                 ))
                 .toList();
 
@@ -112,7 +114,9 @@ public class SegmentationPublicationSyncRunner {
                 SocialNetwork.fromString(r.network()),
                 r.text(),
                 r.createdAt(),
-                null
+                null,
+                r.color(),
+                r.emotion()
             ))
             .toList();
 

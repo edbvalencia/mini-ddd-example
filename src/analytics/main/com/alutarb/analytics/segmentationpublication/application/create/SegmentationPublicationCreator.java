@@ -27,8 +27,8 @@ public class SegmentationPublicationCreator {
             command.text(),
             command.createdAt(),
             command.embedding(),
-            null,
-            null
+            command.color(),
+            command.emotion()
         );
         repository.save(publication);
         eventBus.publish(publication.pullDomainEvents());

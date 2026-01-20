@@ -75,7 +75,7 @@ public class MongoSegmentationPublicationRepository implements SegmentationPubli
                     pub.createdAt(),
                     embedding,
                     pub.color(),
-                    pub.sentiment()
+                    pub.emotion()
                 );
             })
             .filter(p -> p != null)
@@ -173,7 +173,7 @@ public class MongoSegmentationPublicationRepository implements SegmentationPubli
                     pub.createdAt(),
                     embedding,
                     pub.color(),
-                    pub.sentiment()
+                    pub.emotion()
                 );
             })
             .filter(p -> p != null)

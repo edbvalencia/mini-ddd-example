@@ -16,4 +16,12 @@ public enum PublicationSentimentType {
     public boolean isNeutral() {
         return this == NEUTRAL;
     }
+
+    public static PublicationSentimentType from(String name) {
+        return valueOf(name);
+    }
+
+    public static PublicationSentimentType from(int value) {
+        return values()[value];
+    }
 }

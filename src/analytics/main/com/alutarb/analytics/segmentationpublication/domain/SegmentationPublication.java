@@ -4,7 +4,6 @@ import java.time.Instant;
 import java.util.List;
 
 import com.alutarb.shared.domain.AggregateRoot;
-import com.alutarb.shared.domain.PublicationSentimentType;
 import com.alutarb.shared.domain.SocialNetwork;
 
 public class SegmentationPublication extends AggregateRoot {
@@ -20,7 +19,7 @@ public class SegmentationPublication extends AggregateRoot {
     private Instant createdAt;
     private List<Double> embedding;
     private String color;
-    private PublicationSentimentType sentiment;
+    private String emotion;
 
     public SegmentationPublication(
         String id,
@@ -34,7 +33,7 @@ public class SegmentationPublication extends AggregateRoot {
         Instant createdAt,
         List<Double> embedding,
         String color,
-        PublicationSentimentType sentiment
+        String emotion
     ) {
         this.id = id;
         this.audience = audience;
@@ -47,7 +46,7 @@ public class SegmentationPublication extends AggregateRoot {
         this.createdAt = createdAt;
         this.embedding = embedding;
         this.color = color;
-        this.sentiment = sentiment;
+        this.emotion = emotion;
     }
 
     public static SegmentationPublication create(
@@ -122,8 +121,8 @@ public class SegmentationPublication extends AggregateRoot {
         return color;
     }
 
-    public PublicationSentimentType sentiment() {
-        return sentiment;
+    public String emotion() {
+        return emotion;
     }
 
 }

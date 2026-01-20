@@ -15,6 +15,8 @@ public record CreateSegmentationPublicationCommand(
     SocialNetwork socialNetwork,
     String text,
     Instant createdAt,
-    List<Double> embedding
+    List<Double> embedding,
+    String color,
+    String emotion
 ) {
 }
