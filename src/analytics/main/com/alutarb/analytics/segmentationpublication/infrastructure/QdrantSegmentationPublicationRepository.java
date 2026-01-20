@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.ai.document.Document;
 import org.springframework.ai.vectorstore.SearchRequest;
@@ -15,6 +16,14 @@ import org.springframework.stereotype.Component;
 import com.alutarb.analytics.segmentationpublication.domain.SegmentationPublication;
 import com.alutarb.analytics.shared.infrastructure.VectorStoreUtils;
 
+import io.qdrant.client.QdrantClient;
+import io.qdrant.client.grpc.Points.PointId;
+import io.qdrant.client.grpc.Points.RetrievedPoint;
+import io.qdrant.client.grpc.Points.WithPayloadSelector;
+import io.qdrant.client.grpc.Points.WithVectorsSelector;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Component
 public class QdrantSegmentationPublicationRepository {
 
@@ -22,10 +31,16 @@ public class QdrantSegmentationPublicationRepository {
     }
 
     private static final int MAX_TEXT_CHARS = 2000;
+    private static final String COLLECTION_NAME = "segmentationpublication";
     private final VectorStore vectorStore;
+    private final QdrantClient qdrantClient;
 
-    public QdrantSegmentationPublicationRepository(@Qualifier("segmentationpublication") VectorStore vectorStore) {
+    public QdrantSegmentationPublicationRepository(
+        @Qualifier("segmentationpublication") VectorStore vectorStore,
+        QdrantClient qdrantClient
+    ) {
         this.vectorStore = vectorStore;
+        this.qdrantClient = qdrantClient;
     }
 
     public void save(SegmentationPublication publication) {
@@ -72,26 +87,53 @@ public class QdrantSegmentationPublicationRepository {
         var documents = vectorStore.similaritySearch(request);
 
         Map<String, List<Double>> embeddingsById = new java.util.LinkedHashMap<>();
+        List<PointId> pointIds = new ArrayList<>();
+        Map<String, String> uuidToId = new HashMap<>();
+
         for (var doc : documents) {
             String id = (String) doc.getMetadata().get("id");
             if (id != null) {
-                try {
-                    Object embeddingObj = doc.getMetadata().get("embedding");
-                    if (embeddingObj instanceof List<?> embList) {
-                        List<Double> embedding = new ArrayList<>();
-                        for (Object obj : embList) {
-                            if (obj instanceof Number num) {
-                                embedding.add(num.doubleValue());
+                String uuid = VectorStoreUtils.toUuid(id);
+                pointIds.add(PointId.newBuilder().setUuid(uuid).build());
+                uuidToId.put(uuid, id);
+            }
+        }
+
+        if (!pointIds.isEmpty()) {
+            try {
+                var withVectors = WithVectorsSelector.newBuilder().setEnable(true).build();
+                var withPayload = WithPayloadSelector.newBuilder().setEnable(false).build();
+
+                List<RetrievedPoint> response = qdrantClient.retrieveAsync(
+                    COLLECTION_NAME,
+                    pointIds,
+                    withPayload,
+                    withVectors,
+                    null   // readConsistency
+                ).get();
+
+                for (RetrievedPoint point : response) {
+                    String uuid = point.getId().getUuid();
+                    String id = uuidToId.get(uuid);
+
+                    if (id != null && point.hasVectors()) {
+                        var vectors = point.getVectors();
+                        if (vectors.hasVector()) {
+                            var vectorData = vectors.getVector().getDataList();
+                            List<Double> embedding = new ArrayList<>(vectorData.size());
+                            for (float f : vectorData) {
+                                embedding.add((double) f);
                             }
-                        }
-                        if (!embedding.isEmpty()) {
                             embeddingsById.put(id, embedding);
                         }
                     }
-                } catch (Exception e) {
                 }
+            } catch (InterruptedException | ExecutionException e) {
+                log.error("Error retrieving embeddings from Qdrant", e);
+                Thread.currentThread().interrupt();
             }
         }
+
         return embeddingsById;
     }
 
@@ -148,14 +190,14 @@ public class QdrantSegmentationPublicationRepository {
         }
 
         if (fromMs != null && toMs != null) {
-            return "createdAtEpochMs >= " + fromMs + " && createdAtEpochMs <= " + toMs;
+            return "createdAtEpochMs >= " + fromMs + "L && createdAtEpochMs <= " + toMs + "L";
         }
 
         if (fromMs != null) {
-            return "createdAtEpochMs >= " + fromMs;
+            return "createdAtEpochMs >= " + fromMs + "L";
         }
 
-        return "createdAtEpochMs <= " + toMs;
+        return "createdAtEpochMs <= " + toMs + "L";
     }
 
     private String safeText(String text) {

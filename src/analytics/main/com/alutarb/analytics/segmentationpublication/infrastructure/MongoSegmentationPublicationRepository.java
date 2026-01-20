@@ -7,6 +7,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.bson.Document;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.aggregation.AggregationResults;
@@ -20,11 +21,14 @@ import com.alutarb.analytics.segmentationpublication.domain.SegmentationPublicat
 import com.alutarb.analytics.segmentationpublication.domain.SegmentationPublicationSearchResult;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class MongoSegmentationPublicationRepository implements SegmentationPublicationRepository {
 
+    @Qualifier("segmentationMongoTemplate")
     private final MongoTemplate template;
     private final QdrantSegmentationPublicationRepository qdrantRepository;
 
@@ -41,7 +45,10 @@ public class MongoSegmentationPublicationRepository implements SegmentationPubli
         Instant createdAtTo
     ) {
         var embeddingsById = qdrantRepository.searchWithEmbeddings(query, limit, createdAtFrom, createdAtTo);
-        if (embeddingsById.isEmpty()) return List.of();
+
+        if (embeddingsById.isEmpty()) {
+            return List.of();
+        }
 
         var ids = List.copyOf(embeddingsById.keySet());
         var mongoQuery = new Query(Criteria.where("_id").in(ids));
@@ -87,6 +94,14 @@ public class MongoSegmentationPublicationRepository implements SegmentationPubli
         }
 
         var ids = List.copyOf(embeddingsById.keySet());
+
+        var mongoQuery = new Query(Criteria.where("_id").in(ids));
+        var publications = template.find(mongoQuery, SegmentationPublication.class);
+
+        if (publications.isEmpty()) {
+            return new SegmentationPublicationSearchResult(List.of(), SegmentationPublicationQueryStats.empty());
+        }
+
         var matchStage = Aggregation.match(Criteria.where("_id").in(ids));
 
         var aggregation = Aggregation.newAggregation(
@@ -115,9 +130,6 @@ public class MongoSegmentationPublicationRepository implements SegmentationPubli
         }
 
         @SuppressWarnings("unchecked") List<Document> statsDocs = (List<Document>) doc.get("stats");
-
-        var mongoQuery = new Query(Criteria.where("_id").in(ids));
-        var publications = template.find(mongoQuery, SegmentationPublication.class);
 
         Map<String, SegmentationPublication> byId = publications.stream()
             .collect(Collectors.toMap(SegmentationPublication::id, Function.identity()));

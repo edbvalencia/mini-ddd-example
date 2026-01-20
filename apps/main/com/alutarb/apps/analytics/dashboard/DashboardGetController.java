@@ -14,42 +14,54 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class DashboardGetController {
 
-    private final PublicationsCounterSearcher searcher;
-    private final InteractionsCounterSearcher interactionsCounterSearcher;
-    private final SentimentCounterSearcher sentimentCounterSearcher;
+        private final PublicationsCounterSearcher searcher;
+        private final InteractionsCounterSearcher interactionsCounterSearcher;
+        private final SentimentCounterSearcher sentimentCounterSearcher;
 
-    @GetMapping("/dashboard")
-    public DashboardResponse dashboard() {
-        var publications = searcher.search(Constants.ID);
-        var interactions = interactionsCounterSearcher.search(Constants.ID);
-        var sentiments = sentimentCounterSearcher.search(Constants.ID);
+        @GetMapping("/dashboard")
+        public DashboardResponse dashboard() {
+                var publications = searcher.search(Constants.ID);
+                var interactions = interactionsCounterSearcher.search(Constants.ID);
+                var sentiments = sentimentCounterSearcher.search(Constants.ID);
 
-        var interactionsChart = new InteractionsChartResponse(interactions.likesCount(), interactions.sharesCount(),
-                interactions.commentsCount(), interactions.viewsCount());
+                var interactionsChart = interactions == null ? new InteractionsChartResponse(0, 0, 0,
+                        0) : new InteractionsChartResponse(
+                                interactions.likesCount(),
+                                interactions.sharesCount(),
+                                interactions.commentsCount(),
+                                interactions.viewsCount()
+                        );
 
-        var sentimentChart = new SentimentChartResponse(sentiments.positiveCount(), sentiments.negativeCount(),
-                sentiments.neutralCount());
+                var sentimentChart = sentiments == null ? new SentimentChartResponse(0, 0,
+                        0) : new SentimentChartResponse(
+                                sentiments.positiveCount(),
+                                sentiments.negativeCount(),
+                                sentiments.neutralCount()
+                        );
 
-        return new DashboardResponse(publications.count(), interactionsChart, sentimentChart);
-    }
+                var publicationsCount = publications == null ? 0 : publications.count();
 
-    public record SentimentChartResponse(
-            int positive,
-            int negative,
-            int neutral) {
-    }
+                return new DashboardResponse(publicationsCount, interactionsChart, sentimentChart);
+        }
 
-    public record DashboardResponse(
-            long publications,
-            InteractionsChartResponse interactionsChart,
-            SentimentChartResponse sentimentChart) {
-    }
+        public record SentimentChartResponse(
+                int positive,
+                int negative,
+                int neutral
+        ) {
+        }
 
-    public record InteractionsChartResponse(
-            int likes,
-            int shares,
-            int comments,
-            int views) {
-    }
+        public record DashboardResponse(
+                long publications,
+                InteractionsChartResponse interactionsChart,
+                SentimentChartResponse sentimentChart) {
+        }
+
+        public record InteractionsChartResponse(
+                int likes,
+                int shares,
+                int comments,
+                int views) {
+        }
 
 }
