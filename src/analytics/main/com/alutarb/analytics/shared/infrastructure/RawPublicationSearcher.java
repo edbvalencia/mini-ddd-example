@@ -62,6 +62,7 @@ public class RawPublicationSearcher {
                     rs.getInt("views"),
                     rs.getInt("comments"),
                     parseSentiment(rs.getInt("sentiment")),
+                    rs.getString("color"),
                     parseList(rs.getString("hashtags")),
                     parseList(rs.getString("mentions")),
                     parseList(rs.getString("emojis")),

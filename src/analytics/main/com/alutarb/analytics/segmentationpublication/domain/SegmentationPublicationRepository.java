@@ -14,6 +14,15 @@ public interface SegmentationPublicationRepository {
     SegmentationPublicationSearchResult searchByQueryWithStats(String query, int limit, Instant createdAtFrom,
         Instant createdAtTo);
 
+    SegmentationPublicationSearchResult searchByQueryWithStats(
+        String query,
+        int limit,
+        Instant createdAtFrom,
+        Instant createdAtTo,
+        Double scoreThreshold,
+        String payloadFilterExpression
+    );
+
     void save(SegmentationPublication publication);
 
 }

@@ -44,7 +44,8 @@ public class MongoSegmentationPublicationRepository implements SegmentationPubli
         Instant createdAtFrom,
         Instant createdAtTo
     ) {
-        var embeddingsById = qdrantRepository.searchWithEmbeddings(query, limit, createdAtFrom, createdAtTo);
+        var embeddingsById = qdrantRepository.searchWithEmbeddings(query, limit, createdAtFrom, createdAtTo, null,
+            null);
 
         if (embeddingsById.isEmpty()) {
             return List.of();
@@ -72,7 +73,9 @@ public class MongoSegmentationPublicationRepository implements SegmentationPubli
                     pub.socialNetwork(),
                     pub.text(),
                     pub.createdAt(),
-                    embedding
+                    embedding,
+                    pub.color(),
+                    pub.sentiment()
                 );
             })
             .filter(p -> p != null)
@@ -87,7 +90,26 @@ public class MongoSegmentationPublicationRepository implements SegmentationPubli
     @Override
     public SegmentationPublicationSearchResult searchByQueryWithStats(String query, int limit, Instant createdAtFrom,
         Instant createdAtTo) {
-        var embeddingsById = qdrantRepository.searchWithEmbeddings(query, limit, createdAtFrom, createdAtTo);
+        return searchByQueryWithStats(query, limit, createdAtFrom, createdAtTo, null, null);
+    }
+
+    @Override
+    public SegmentationPublicationSearchResult searchByQueryWithStats(
+        String query,
+        int limit,
+        Instant createdAtFrom,
+        Instant createdAtTo,
+        Double scoreThreshold,
+        String payloadFilterExpression
+    ) {
+        var embeddingsById = qdrantRepository.searchWithEmbeddings(
+            query,
+            limit,
+            createdAtFrom,
+            createdAtTo,
+            scoreThreshold,
+            payloadFilterExpression
+        );
 
         if (embeddingsById.isEmpty()) {
             return new SegmentationPublicationSearchResult(List.of(), SegmentationPublicationQueryStats.empty());
@@ -149,7 +171,9 @@ public class MongoSegmentationPublicationRepository implements SegmentationPubli
                     pub.socialNetwork(),
                     pub.text(),
                     pub.createdAt(),
-                    embedding
+                    embedding,
+                    pub.color(),
+                    pub.sentiment()
                 );
             })
             .filter(p -> p != null)

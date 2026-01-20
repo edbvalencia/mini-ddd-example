@@ -22,9 +22,13 @@ public class PublicationGetController {
         @RequestParam String query,
         @RequestParam(defaultValue = "10") int size,
         @RequestParam(required = false) Instant from,
-        @RequestParam(required = false) Instant to
+        @RequestParam(required = false) Instant to,
+        @RequestParam(required = false) Double scoreThreshold,
+        @RequestParam(required = false) String payloadFilterExpression,
+        @RequestParam(defaultValue = "false") boolean includeEmbeddings
     ) {
-        return segmentationSearcher.searchByQueryWithStats(query, size, from, to);
+        return segmentationSearcher.searchByQueryWithStats(query, size, from, to, scoreThreshold,
+            payloadFilterExpression, includeEmbeddings);
     }
 
 }

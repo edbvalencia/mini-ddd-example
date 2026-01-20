@@ -26,13 +26,58 @@ public class SegmentationPublicationSearcher {
     }
 
     public SegmentationPublicationsResponse searchByQueryWithStats(String query, int limit) {
-        return searchByQueryWithStats(query, limit, null, null);
+        return searchByQueryWithStats(query, limit, null, null, null, null);
     }
 
     public SegmentationPublicationsResponse searchByQueryWithStats(String query, int limit, Instant createdAtFrom,
         Instant createdAtTo) {
-        var result = repository.searchByQueryWithStats(query, limit, createdAtFrom, createdAtTo);
-        var publications = result.publications().stream().map(SegmentationPublicationResponse::of).toList();
+        return searchByQueryWithStats(query, limit, createdAtFrom, createdAtTo, null, null);
+    }
+
+    public SegmentationPublicationsResponse searchByQueryWithStats(
+        String query,
+        int limit,
+        Instant createdAtFrom,
+        Instant createdAtTo,
+        Double scoreThreshold,
+        String payloadFilterExpression
+    ) {
+        return searchByQueryWithStats(query, limit, createdAtFrom, createdAtTo, scoreThreshold,
+            payloadFilterExpression, true);
+    }
+
+    public SegmentationPublicationsResponse searchByQueryWithStats(
+        String query,
+        int limit,
+        Instant createdAtFrom,
+        Instant createdAtTo,
+        Double scoreThreshold,
+        String payloadFilterExpression,
+        boolean includeEmbeddings
+    ) {
+        var result = repository.searchByQueryWithStats(query, limit, createdAtFrom, createdAtTo, scoreThreshold,
+            payloadFilterExpression);
+
+        var publications = result.publications().stream()
+            .map(publication -> {
+                if (includeEmbeddings) {
+                    return SegmentationPublicationResponse.of(publication);
+                }
+                return new SegmentationPublicationResponse(
+                    publication.id(),
+                    publication.audience(),
+                    publication.comments(),
+                    publication.interactions(),
+                    publication.reactions(),
+                    publication.shares(),
+                    publication.socialNetwork(),
+                    publication.text(),
+                    publication.createdAt(),
+                    null
+                );
+            })
+            .toList();
+
         return new SegmentationPublicationsResponse(publications);
     }
 

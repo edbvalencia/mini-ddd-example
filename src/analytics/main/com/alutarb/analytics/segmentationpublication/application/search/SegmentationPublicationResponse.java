@@ -5,7 +5,9 @@ import java.util.List;
 
 import com.alutarb.analytics.segmentationpublication.domain.SegmentationPublication;
 import com.alutarb.shared.domain.SocialNetwork;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public record SegmentationPublicationResponse(
     String id,
     Long audience,

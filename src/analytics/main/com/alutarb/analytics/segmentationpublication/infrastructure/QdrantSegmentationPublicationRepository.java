@@ -72,15 +72,25 @@ public class QdrantSegmentationPublicationRepository {
             .toList();
     }
 
-    public Map<String, List<Double>> searchWithEmbeddings(String query, int limit, Instant createdAtFrom,
-        Instant createdAtTo) {
+    public Map<String, List<Double>> searchWithEmbeddings(
+        String query,
+        int limit,
+        Instant createdAtFrom,
+        Instant createdAtTo,
+        Double scoreThreshold,
+        String payloadFilterExpression
+    ) {
         var builder = SearchRequest.builder()
             .query(query)
             .topK(limit);
 
-        String filterExpression = buildCreatedAtFilterExpression(createdAtFrom, createdAtTo);
+        String filterExpression = buildFilterExpression(createdAtFrom, createdAtTo, payloadFilterExpression);
         if (filterExpression != null) {
             builder.filterExpression(filterExpression);
+        }
+
+        if (scoreThreshold != null) {
+            builder.similarityThreshold(scoreThreshold);
         }
 
         var request = builder.build();
@@ -109,7 +119,7 @@ public class QdrantSegmentationPublicationRepository {
                     pointIds,
                     withPayload,
                     withVectors,
-                    null   // readConsistency
+                    null
                 ).get();
 
                 for (RetrievedPoint point : response) {
@@ -149,6 +159,8 @@ public class QdrantSegmentationPublicationRepository {
         Map<String, Object> metadata = new HashMap<>();
         put(metadata, "id", publication.id());
         put(metadata, "createdAt", toString(publication.createdAt()));
+        put(metadata, "color", publication.color());
+        put(metadata, "sentiment", publication.sentiment());
         put(metadata, "createdAtEpochMs", toEpochMillis(publication.createdAt()));
         return metadata;
     }
@@ -198,6 +210,20 @@ public class QdrantSegmentationPublicationRepository {
         }
 
         return "createdAtEpochMs <= " + toMs + "L";
+    }
+
+    private String buildFilterExpression(Instant createdAtFrom, Instant createdAtTo, String payloadFilterExpression) {
+        String dateFilter = buildCreatedAtFilterExpression(createdAtFrom, createdAtTo);
+
+        if (payloadFilterExpression == null || payloadFilterExpression.isBlank()) {
+            return dateFilter;
+        }
+
+        if (dateFilter == null || dateFilter.isBlank()) {
+            return payloadFilterExpression;
+        }
+
+        return dateFilter + " && (" + payloadFilterExpression + ")";
     }
 
     private String safeText(String text) {

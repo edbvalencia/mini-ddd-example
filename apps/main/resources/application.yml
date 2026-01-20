@@ -2,6 +2,8 @@ server:
   port: ${SERVER_PORT}
   servlet:
     context-path: ${SERVER_CONTEXT_PATH}
+  tomcat:
+    connection-timeout: 60s
 
 spring:
   application:

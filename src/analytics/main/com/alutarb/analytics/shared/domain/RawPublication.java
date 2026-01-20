@@ -13,6 +13,7 @@ public record RawPublication(
     Integer views,
     Integer comments,
     PublicationSentimentType sentiment,
+    String color,
     List<String> hashtags,
     List<String> mentions,
     List<String> emojis,
