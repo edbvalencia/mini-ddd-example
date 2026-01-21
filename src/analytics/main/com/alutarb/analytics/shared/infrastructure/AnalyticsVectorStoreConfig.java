@@ -8,6 +8,7 @@ import org.springframework.ai.vectorstore.qdrant.QdrantVectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import io.qdrant.client.QdrantClient;
 import io.qdrant.client.grpc.Collections.Distance;
@@ -16,7 +17,7 @@ import io.qdrant.client.grpc.Collections.VectorParams;
 @Configuration
 public class AnalyticsVectorStoreConfig {
 
-    private static final int EMBEDDING_DIMENSIONS = 1024;
+    private static final int EMBEDDING_DIMENSIONS = 768;
 
     @Bean
     public ChatClient chatClient(ChatModel chatModel) {
@@ -24,27 +25,25 @@ public class AnalyticsVectorStoreConfig {
     }
 
     @Bean
-    public EmbeddingModel normalizingEmbeddingModel(EmbeddingModel embeddingModel) {
+    @Primary
+    public EmbeddingModel normalizingEmbeddingModel(@Qualifier("ollamaEmbeddingModel") EmbeddingModel embeddingModel) {
         return new NormalizingEmbeddingModel(embeddingModel);
     }
 
     @Bean("analyticspublication")
-    public VectorStore publicationVectorStore(QdrantClient qdrantClient,
-        @Qualifier("normalizingEmbeddingModel") EmbeddingModel embeddingModel) {
+    public VectorStore publicationVectorStore(QdrantClient qdrantClient, EmbeddingModel embeddingModel) {
         ensureCollection(qdrantClient, "analyticspublication");
         return buildVectorStore(qdrantClient, embeddingModel, "analyticspublication");
     }
 
     @Bean("analyticspublication-v2")
-    public VectorStore publicationVectorStoreV2(QdrantClient qdrantClient,
-        @Qualifier("normalizingEmbeddingModel") EmbeddingModel embeddingModel) {
+    public VectorStore publicationVectorStoreV2(QdrantClient qdrantClient, EmbeddingModel embeddingModel) {
         ensureCollection(qdrantClient, "analyticspublication-v2");
         return buildVectorStore(qdrantClient, embeddingModel, "analyticspublication-v2");
     }
 
     @Bean("segmentationpublication")
-    public VectorStore segmentationPublicationVectorStore(QdrantClient qdrantClient,
-        @Qualifier("normalizingEmbeddingModel") EmbeddingModel embeddingModel) {
+    public VectorStore segmentationPublicationVectorStore(QdrantClient qdrantClient, EmbeddingModel embeddingModel) {
         ensureCollection(qdrantClient, "segmentationpublication");
         return buildVectorStore(qdrantClient, embeddingModel, "segmentationpublication");
     }
@@ -73,4 +72,5 @@ public class AnalyticsVectorStoreConfig {
             throw new RuntimeException("Error ensuring Qdrant collection: " + collectionName, e);
         }
     }
+
 }

@@ -161,7 +161,8 @@ public class QdrantSegmentationPublicationRepository {
         put(metadata, "createdAt", toString(publication.createdAt()));
         put(metadata, "color", publication.color());
         put(metadata, "emotion", publication.emotion());
-        put(metadata, "createdAtEpochMs", toEpochMillis(publication.createdAt()));
+        put(metadata, "gobColor", publication.gobColor());
+        put(metadata, "registeredAt", toString(publication.registeredAt()));
         return metadata;
     }
 

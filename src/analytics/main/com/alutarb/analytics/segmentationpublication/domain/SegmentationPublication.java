@@ -2,6 +2,7 @@ package com.alutarb.analytics.segmentationpublication.domain;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 
 import com.alutarb.shared.domain.AggregateRoot;
 import com.alutarb.shared.domain.SocialNetwork;
@@ -20,6 +21,26 @@ public class SegmentationPublication extends AggregateRoot {
     private List<Double> embedding;
     private String color;
     private String emotion;
+    private String link;
+    private String media;
+    private String gobColor;
+    private String itemType;
+    private String page;
+    private String avatar;
+    private String dataType;
+    private String impactLevel;
+    private String platform;
+    private String reachLevel;
+    private Instant registeredAt;
+    private Map<String, Object> bigFive;
+    private String cleanText;
+    private Boolean isValid;
+    private String municipality;
+    private String subtopic;
+    private String summary;
+    private String title;
+    private String topic;
+    private Boolean validText;
 
     public SegmentationPublication(
         String id,
@@ -33,7 +54,27 @@ public class SegmentationPublication extends AggregateRoot {
         Instant createdAt,
         List<Double> embedding,
         String color,
-        String emotion
+        String emotion,
+        String link,
+        String media,
+        String gobColor,
+        String itemType,
+        String page,
+        String avatar,
+        String dataType,
+        String impactLevel,
+        String platform,
+        String reachLevel,
+        Instant registeredAt,
+        Map<String, Object> bigFive,
+        String cleanText,
+        Boolean isValid,
+        String municipality,
+        String subtopic,
+        String summary,
+        String title,
+        String topic,
+        Boolean validText
     ) {
         this.id = id;
         this.audience = audience;
@@ -47,6 +88,26 @@ public class SegmentationPublication extends AggregateRoot {
         this.embedding = embedding;
         this.color = color;
         this.emotion = emotion;
+        this.link = link;
+        this.media = media;
+        this.gobColor = gobColor;
+        this.itemType = itemType;
+        this.page = page;
+        this.avatar = avatar;
+        this.dataType = dataType;
+        this.impactLevel = impactLevel;
+        this.platform = platform;
+        this.reachLevel = reachLevel;
+        this.registeredAt = registeredAt;
+        this.bigFive = bigFive;
+        this.cleanText = cleanText;
+        this.isValid = isValid;
+        this.municipality = municipality;
+        this.subtopic = subtopic;
+        this.summary = summary;
+        this.title = title;
+        this.topic = topic;
+        this.validText = validText;
     }
 
     public static SegmentationPublication create(
@@ -72,6 +133,26 @@ public class SegmentationPublication extends AggregateRoot {
             text,
             createdAt,
             embedding,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
             null,
             null
         );
@@ -123,6 +204,86 @@ public class SegmentationPublication extends AggregateRoot {
 
     public String emotion() {
         return emotion;
+    }
+
+    public String link() {
+        return link;
+    }
+
+    public String media() {
+        return media;
+    }
+
+    public String gobColor() {
+        return gobColor;
+    }
+
+    public String itemType() {
+        return itemType;
+    }
+
+    public String page() {
+        return page;
+    }
+
+    public String avatar() {
+        return avatar;
+    }
+
+    public String dataType() {
+        return dataType;
+    }
+
+    public String impactLevel() {
+        return impactLevel;
+    }
+
+    public String platform() {
+        return platform;
+    }
+
+    public String reachLevel() {
+        return reachLevel;
+    }
+
+    public Instant registeredAt() {
+        return registeredAt;
+    }
+
+    public Map<String, Object> bigFive() {
+        return bigFive;
+    }
+
+    public String cleanText() {
+        return cleanText;
+    }
+
+    public Boolean isValid() {
+        return isValid;
+    }
+
+    public String municipality() {
+        return municipality;
+    }
+
+    public String subtopic() {
+        return subtopic;
+    }
+
+    public String summary() {
+        return summary;
+    }
+
+    public String title() {
+        return title;
+    }
+
+    public String topic() {
+        return topic;
+    }
+
+    public Boolean validText() {
+        return validText;
     }
 
 }

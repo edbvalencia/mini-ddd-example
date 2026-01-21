@@ -28,7 +28,27 @@ public class SegmentationPublicationCreator {
             command.createdAt(),
             command.embedding(),
             command.color(),
-            command.emotion()
+            command.emotion(),
+            command.link(),
+            command.media(),
+            command.gobColor(),
+            command.itemType(),
+            command.page(),
+            command.avatar(),
+            command.dataType(),
+            command.impactLevel(),
+            command.platform(),
+            command.reachLevel(),
+            command.registeredAt(),
+            command.bigFive(),
+            command.cleanText(),
+            command.isValid(),
+            command.municipality(),
+            command.subtopic(),
+            command.summary(),
+            command.title(),
+            command.topic(),
+            command.validText()
         );
         repository.save(publication);
         eventBus.publish(publication.pullDomainEvents());

@@ -8,10 +8,6 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.embedding.EmbeddingRequest;
 import org.springframework.ai.embedding.EmbeddingResponse;
 
-/**
- * Wrapper around EmbeddingModel that normalizes embeddings using L2 normalization.
- * This is equivalent to Python's encoder.encode(texts, normalize_embeddings=True).
- */
 public class NormalizingEmbeddingModel implements EmbeddingModel {
 
     private final EmbeddingModel delegate;
@@ -68,10 +64,6 @@ public class NormalizingEmbeddingModel implements EmbeddingModel {
         return new Embedding(normalized, embedding.getIndex());
     }
 
-    /**
-     * L2 normalization: divide each component by the vector's magnitude.
-     * Result is a unit vector with magnitude = 1.
-     */
     private float[] normalizeVector(float[] vector) {
         if (vector == null || vector.length == 0) {
             return vector;
@@ -91,7 +83,7 @@ public class NormalizingEmbeddingModel implements EmbeddingModel {
         for (int i = 0; i < vector.length; i++) {
             normalized[i] = (float) (vector[i] / magnitude);
         }
-
         return normalized;
     }
+
 }

@@ -60,7 +60,27 @@ public class SegmentationPublicationSyncRunner {
                     r.createdAt(),
                     null,
                     r.color(),
-                    r.emotion()
+                    r.emotion(),
+                    r.link(),
+                    r.media(),
+                    r.gobColor(),
+                    r.itemType(),
+                    r.page(),
+                    r.avatar(),
+                    r.dataType(),
+                    r.impactLevel(),
+                    r.platform(),
+                    r.reachLevel(),
+                    r.registeredAt(),
+                    r.bigFive(),
+                    r.cleanText(),
+                    r.isValid(),
+                    r.municipality(),
+                    r.subtopic(),
+                    r.summary(),
+                    r.title(),
+                    r.topic(),
+                    r.validText()
                 ))
                 .toList();
 
@@ -116,7 +136,27 @@ public class SegmentationPublicationSyncRunner {
                 r.createdAt(),
                 null,
                 r.color(),
-                r.emotion()
+                r.emotion(),
+                r.link(),
+                r.media(),
+                r.gobColor(),
+                r.itemType(),
+                r.page(),
+                r.avatar(),
+                r.dataType(),
+                r.impactLevel(),
+                r.platform(),
+                r.reachLevel(),
+                r.registeredAt(),
+                r.bigFive(),
+                r.cleanText(),
+                r.isValid(),
+                r.municipality(),
+                r.subtopic(),
+                r.summary(),
+                r.title(),
+                r.topic(),
+                r.validText()
             ))
             .toList();
 

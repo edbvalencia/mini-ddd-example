@@ -75,7 +75,27 @@ public class MongoSegmentationPublicationRepository implements SegmentationPubli
                     pub.createdAt(),
                     embedding,
                     pub.color(),
-                    pub.emotion()
+                    pub.emotion(),
+                    pub.link(),
+                    pub.media(),
+                    pub.gobColor(),
+                    pub.itemType(),
+                    pub.page(),
+                    pub.avatar(),
+                    pub.dataType(),
+                    pub.impactLevel(),
+                    pub.platform(),
+                    pub.reachLevel(),
+                    pub.registeredAt(),
+                    pub.bigFive(),
+                    pub.cleanText(),
+                    pub.isValid(),
+                    pub.municipality(),
+                    pub.subtopic(),
+                    pub.summary(),
+                    pub.title(),
+                    pub.topic(),
+                    pub.validText()
                 );
             })
             .filter(p -> p != null)
@@ -173,7 +193,27 @@ public class MongoSegmentationPublicationRepository implements SegmentationPubli
                     pub.createdAt(),
                     embedding,
                     pub.color(),
-                    pub.emotion()
+                    pub.emotion(),
+                    pub.link(),
+                    pub.media(),
+                    pub.gobColor(),
+                    pub.itemType(),
+                    pub.page(),
+                    pub.avatar(),
+                    pub.dataType(),
+                    pub.impactLevel(),
+                    pub.platform(),
+                    pub.reachLevel(),
+                    pub.registeredAt(),
+                    pub.bigFive(),
+                    pub.cleanText(),
+                    pub.isValid(),
+                    pub.municipality(),
+                    pub.subtopic(),
+                    pub.summary(),
+                    pub.title(),
+                    pub.topic(),
+                    pub.validText()
                 );
             })
             .filter(p -> p != null)
