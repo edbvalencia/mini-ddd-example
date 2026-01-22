@@ -56,8 +56,12 @@ public class RawSegmentationPublicationSearcher {
     }
 
     public List<RawMention> searchByDateRange(Instant from, Instant to, int offset, int size) {
+        // Use fixed dates if null parameters are provided
+        Instant actualFrom = (from != null) ? from : FIXED_FROM;
+        Instant actualTo = (to != null) ? to : FIXED_TO;
+
         Query query = new Query()
-            .addCriteria(Criteria.where("createdAt").gte(from).lt(to))
+            .addCriteria(Criteria.where("createdAt").gte(actualFrom).lt(actualTo))
             .addCriteria(Criteria.where("isValid").is(true))
             .skip(offset)
             .limit(size)

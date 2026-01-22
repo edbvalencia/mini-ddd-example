@@ -46,10 +46,18 @@ public class FixedDateRangeSyncRunner {
                 break;
             }
 
-            // Save directly to Qdrant (no MongoDB storage)
             records.forEach(qdrantRepository::save);
 
-            System.out.println("[FIXED-SYNC] Saved " + records.size() + " records to Qdrant");
+            if (!records.isEmpty()) {
+                var firstRecord = records.get(0);
+                int textLength = firstRecord.text() != null ? firstRecord.text().length() : 0;
+                System.out.println("[FIXED-SYNC] Sample text length: " + textLength + " chars");
+                System.out.println("[FIXED-SYNC] Sample text preview: " +
+                    (firstRecord.text() != null && firstRecord.text().length() > 100 ? firstRecord.text().substring(0,
+                        100) + "..." : firstRecord.text()));
+            }
+
+            System.out.println("[FIXED-SYNC] Saved " + records.size() + " records to Qdrant (duplicates overwritten)");
 
             processed += records.size();
             offset += records.size();

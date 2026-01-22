@@ -119,7 +119,8 @@ public class SegmentationPublication extends AggregateRoot {
         SocialNetwork socialNetwork,
         String text,
         Instant createdAt,
-        List<Double> embedding) {
+        List<Double> embedding
+    ) {
         return new SegmentationPublication(
             id,
             audience,

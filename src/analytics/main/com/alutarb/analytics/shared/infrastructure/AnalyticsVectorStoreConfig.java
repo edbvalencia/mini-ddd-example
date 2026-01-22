@@ -68,11 +68,6 @@ public class AnalyticsVectorStoreConfig {
         return buildVectorStore(qdrantClient, embeddingModel, "segmentationpublication");
     }
 
-    @Bean("rawmention")
-    public VectorStore rawMentionVectorStore(QdrantClient qdrantClient, EmbeddingModel embeddingModel) {
-        ensureCollection(qdrantClient, "rawmention");
-        return buildVectorStore(qdrantClient, embeddingModel, "rawmention");
-    }
 
     private VectorStore buildVectorStore(QdrantClient client, EmbeddingModel embeddingModel, String name) {
         return QdrantVectorStore.builder(client, embeddingModel)

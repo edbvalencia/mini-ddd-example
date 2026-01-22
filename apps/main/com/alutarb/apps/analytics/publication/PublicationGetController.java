@@ -20,7 +20,6 @@ import lombok.RequiredArgsConstructor;
 public class PublicationGetController {
 
     private final RawMentionSearcher rawMentionSearcher;
-    private final RawSegmentationPublicationSearcher rawSearcher;
 
     @GetMapping("/segmentation-publications")
     public RawMentionsResponse search(

@@ -29,10 +29,14 @@ public class RawMentionSearcher {
         boolean includeEmbeddings,
         Set<String> fields
     ) {
-        // Get embeddings from Qdrant
+        System.out.println("[QUERY-SEARCH] Query: " + query);
+        System.out.println("[QUERY-SEARCH] Date filter: " + buildDateFilter(createdAtFrom, createdAtTo));
+
         var embeddingsById = qdrantRepository.searchWithEmbeddings(
             query, limit, createdAtFrom, createdAtTo, scoreThreshold, payloadFilterExpression
         );
+
+        System.out.println("[QUERY-SEARCH] Found " + embeddingsById.size() + " results from Qdrant");
 
         if (embeddingsById.isEmpty()) {
             return new RawMentionsResponse(List.of());
@@ -40,6 +44,8 @@ public class RawMentionSearcher {
 
         List<String> ids = List.copyOf(embeddingsById.keySet());
         List<RawMention> rawMentions = rawSearcher.searchByIds(ids);
+
+        System.out.println("[QUERY-SEARCH] Found " + rawMentions.size() + " RawMentions from MongoDB");
 
         List<RawMentionResponse> responses = rawMentions.stream()
             .map(raw -> {
@@ -65,19 +71,15 @@ public class RawMentionSearcher {
     }
 
     private String buildDateFilter(Instant from, Instant to) {
-        if (from == null && to == null) {
-            return null;
-        }
+        // Use fixed dates if null parameters are provided
+        Instant actualFrom = (from != null) ? from : java.time.LocalDate.of(2025, 11, 1).atStartOfDay(
+            java.time.ZoneOffset.UTC).toInstant();
+        Instant actualTo = (to != null) ? to : java.time.LocalDate.of(2026, 1, 24).atStartOfDay(
+            java.time.ZoneOffset.UTC).toInstant();
 
-        Long fromSec = from != null ? from.getEpochSecond() : null;
-        Long toSec = to != null ? to.getEpochSecond() : null;
+        Long fromSec = actualFrom.getEpochSecond();
+        Long toSec = actualTo.getEpochSecond();
 
-        if (fromSec != null && toSec != null) {
-            return "createdAtSec >= " + fromSec + " && createdAtSec <= " + toSec;
-        }
-        if (fromSec != null) {
-            return "createdAtSec >= " + fromSec;
-        }
-        return "createdAtSec <= " + toSec;
+        return "createdAtSec >= " + fromSec + " && createdAtSec <= " + toSec;
     }
 }

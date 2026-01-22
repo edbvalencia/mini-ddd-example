@@ -27,14 +27,15 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class RawMentionQdrantRepository {
 
-    private static final String COLLECTION_NAME = "rawmention";
-    private static final int MAX_TEXT_CHARS = 2000;
+    private static final String COLLECTION_NAME = "segmentationpublication";
+    private static final int MAX_TEXT_CHARS = 5000;
 
     private final VectorStore vectorStore;
     private final QdrantClient qdrantClient;
     private final EmbeddingModel embeddingModel;
 
-    public RawMentionQdrantRepository(@Qualifier("rawmention") VectorStore vectorStore, QdrantClient qdrantClient,
+    public RawMentionQdrantRepository(@Qualifier("segmentationpublication") VectorStore vectorStore,
+        QdrantClient qdrantClient,
         EmbeddingModel embeddingModel) {
         this.vectorStore = vectorStore;
         this.qdrantClient = qdrantClient;
