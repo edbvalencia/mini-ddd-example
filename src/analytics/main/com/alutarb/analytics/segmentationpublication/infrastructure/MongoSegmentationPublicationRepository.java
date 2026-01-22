@@ -255,4 +255,18 @@ public class MongoSegmentationPublicationRepository implements SegmentationPubli
         qdrantRepository.save(publication);
     }
 
+    public List<SegmentationPublication> searchByDateRange(Instant from, Instant to, int limit) {
+        Criteria criteria = new Criteria();
+        if (from != null && to != null) {
+            criteria = Criteria.where("createdAt").gte(from).lte(to);
+        } else if (from != null) {
+            criteria = Criteria.where("createdAt").gte(from);
+        } else if (to != null) {
+            criteria = Criteria.where("createdAt").lte(to);
+        }
+
+        Query query = new Query(criteria).limit(limit);
+        return template.find(query, SegmentationPublication.class);
+    }
+
 }

@@ -159,6 +159,7 @@ public class QdrantSegmentationPublicationRepository {
         Map<String, Object> metadata = new HashMap<>();
         put(metadata, "id", publication.id());
         put(metadata, "createdAt", toString(publication.createdAt()));
+        put(metadata, "createdAtSec", toEpochSeconds(publication.createdAt()));
         put(metadata, "color", publication.color());
         put(metadata, "emotion", publication.emotion());
         put(metadata, "gobColor", publication.gobColor());
@@ -194,23 +195,27 @@ public class QdrantSegmentationPublicationRepository {
         return value != null ? value.toEpochMilli() : null;
     }
 
-    private String buildCreatedAtFilterExpression(Instant createdAtFrom, Instant createdAtTo) {
-        Long fromMs = toEpochMillis(createdAtFrom);
-        Long toMs = toEpochMillis(createdAtTo);
+    private Integer toEpochSeconds(Instant value) {
+        return value != null ? (int) value.getEpochSecond() : null;
+    }
 
-        if (fromMs == null && toMs == null) {
+    private String buildCreatedAtFilterExpression(Instant createdAtFrom, Instant createdAtTo) {
+        Integer fromSec = toEpochSeconds(createdAtFrom);
+        Integer toSec = toEpochSeconds(createdAtTo);
+
+        if (fromSec == null && toSec == null) {
             return null;
         }
 
-        if (fromMs != null && toMs != null) {
-            return "createdAtEpochMs >= " + fromMs + "L && createdAtEpochMs <= " + toMs + "L";
+        if (fromSec != null && toSec != null) {
+            return "createdAtSec >= " + fromSec + " && createdAtSec <= " + toSec;
         }
 
-        if (fromMs != null) {
-            return "createdAtEpochMs >= " + fromMs + "L";
+        if (fromSec != null) {
+            return "createdAtSec >= " + fromSec;
         }
 
-        return "createdAtEpochMs <= " + toMs + "L";
+        return "createdAtSec <= " + toSec;
     }
 
     private String buildFilterExpression(Instant createdAtFrom, Instant createdAtTo, String payloadFilterExpression) {
