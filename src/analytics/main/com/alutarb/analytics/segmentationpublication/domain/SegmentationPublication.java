@@ -74,8 +74,7 @@ public class SegmentationPublication extends AggregateRoot {
         String summary,
         String title,
         String topic,
-        Boolean validText
-    ) {
+        Boolean validText) {
         this.id = id;
         this.audience = audience;
         this.comments = comments;
@@ -120,8 +119,7 @@ public class SegmentationPublication extends AggregateRoot {
         SocialNetwork socialNetwork,
         String text,
         Instant createdAt,
-        List<Double> embedding
-    ) {
+        List<Double> embedding) {
         return new SegmentationPublication(
             id,
             audience,
@@ -154,8 +152,7 @@ public class SegmentationPublication extends AggregateRoot {
             null,
             null,
             null,
-            null
-        );
+            null);
     }
 
     public String id() {
