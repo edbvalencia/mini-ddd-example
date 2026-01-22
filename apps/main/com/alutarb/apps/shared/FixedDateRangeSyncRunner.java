@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 
 import com.alutarb.analytics.segmentationpublication.application.create.CreateSegmentationPublicationCommand;
 import com.alutarb.analytics.segmentationpublication.application.create.SegmentationPublicationCreator;
+import com.alutarb.analytics.segmentationpublication.domain.SegmentationPublicationRepository;
 import com.alutarb.analytics.shared.domain.RawMention;
 import com.alutarb.analytics.shared.infrastructure.RawSegmentationPublicationSearcher;
 import com.alutarb.shared.domain.SocialNetwork;
@@ -22,6 +23,7 @@ public class FixedDateRangeSyncRunner {
 
     private final RawSegmentationPublicationSearcher rawSearcher;
     private final SegmentationPublicationCreator segmentationPublicationCreator;
+    private final SegmentationPublicationRepository segmentationPublicationRepository;
 
     @Async("segmentationExecutor")
     public CompletableFuture<Void> syncFixedDateRangeAsync() {
@@ -49,10 +51,16 @@ public class FixedDateRangeSyncRunner {
             }
 
             var commands = records.stream()
+                .filter(record -> !alreadyExists(record.id()))
                 .map(this::toCommand)
                 .toList();
 
+            int skipped = records.size() - commands.size();
             commands.forEach(segmentationPublicationCreator::create);
+
+            if (skipped > 0) {
+                System.out.println("[FIXED-SYNC] Skipped " + skipped + " existing records");
+            }
 
             processed += records.size();
             offset += records.size();
@@ -107,6 +115,17 @@ public class FixedDateRangeSyncRunner {
             r.topic(),
             r.validText()
         );
+    }
+
+    private boolean alreadyExists(String id) {
+        try {
+            // Use a simple search to check existence
+            var results = segmentationPublicationRepository.searchByQuery("", 1);
+            return results.stream().anyMatch(pub -> pub.id().equals(id));
+        } catch (Exception e) {
+            // If check fails, assume it doesn't exist and try to create
+            return false;
+        }
     }
 
 }

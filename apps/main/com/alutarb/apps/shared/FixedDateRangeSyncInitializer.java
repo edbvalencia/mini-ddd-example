@@ -20,7 +20,7 @@ public class FixedDateRangeSyncInitializer {
         long totalCount = rawSearcher.countFixedDateRange();
         System.out.println("========================================");
         System.out.println("[FIXED-SYNC] Application started!");
-        System.out.println("[FIXED-SYNC] Date range: 2025-01-12 to 2025-01-23");
+        System.out.println("[FIXED-SYNC] Date range: 2025-11-01 to 2026-01-24");
         System.out.println("[FIXED-SYNC] Records to sync: " + totalCount);
         System.out.println("[FIXED-SYNC] Starting background sync...");
         System.out.println("========================================");

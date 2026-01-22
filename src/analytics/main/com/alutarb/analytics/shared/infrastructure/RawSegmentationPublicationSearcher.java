@@ -18,7 +18,7 @@ import com.alutarb.analytics.shared.domain.RawMention;
 @Service
 public class RawSegmentationPublicationSearcher {
 
-    private static final Instant FIXED_FROM = LocalDate.of(2026, 1, 12).atStartOfDay(ZoneOffset.UTC).toInstant();
+    private static final Instant FIXED_FROM = LocalDate.of(2025, 11, 1).atStartOfDay(ZoneOffset.UTC).toInstant();
     private static final Instant FIXED_TO = LocalDate.of(2026, 1, 24).atStartOfDay(ZoneOffset.UTC).toInstant();
     private static final int PAGE_SIZE = 1000;
 
@@ -30,6 +30,7 @@ public class RawSegmentationPublicationSearcher {
 
     public List<RawMention> search(int offset, int size) {
         Query query = new Query()
+            .addCriteria(Criteria.where("isValid").is(true))
             .skip(offset)
             .limit(size)
             .with(Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -57,6 +58,7 @@ public class RawSegmentationPublicationSearcher {
     public List<RawMention> searchByDateRange(Instant from, Instant to, int offset, int size) {
         Query query = new Query()
             .addCriteria(Criteria.where("createdAt").gte(from).lt(to))
+            .addCriteria(Criteria.where("isValid").is(true))
             .skip(offset)
             .limit(size)
             .with(Sort.by(Sort.Direction.DESC, "createdAt"));
@@ -65,7 +67,8 @@ public class RawSegmentationPublicationSearcher {
 
     public long countFixedDateRange() {
         Query query = new Query()
-            .addCriteria(Criteria.where("createdAt").gte(FIXED_FROM).lt(FIXED_TO));
+            .addCriteria(Criteria.where("createdAt").gte(FIXED_FROM).lt(FIXED_TO))
+            .addCriteria(Criteria.where("isValid").is(true));
         return mongo.count(query, RawMention.class, "segmentation");
     }
 

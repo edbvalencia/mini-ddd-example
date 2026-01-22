@@ -6,6 +6,7 @@ import org.springframework.ai.embedding.EmbeddingModel;
 import org.springframework.ai.vectorstore.VectorStore;
 import org.springframework.ai.vectorstore.qdrant.QdrantVectorStore;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
@@ -18,6 +19,25 @@ import io.qdrant.client.grpc.Collections.VectorParams;
 public class AnalyticsVectorStoreConfig {
 
     private static final int EMBEDDING_DIMENSIONS = 768;
+
+    @Bean
+    public QdrantClient qdrantClient(
+        @Value("${spring.ai.vectorstore.qdrant.host}") String host,
+        @Value("${spring.ai.vectorstore.qdrant.port}") int port,
+        @Value("${spring.ai.vectorstore.qdrant.use-tls:false}") boolean useTls
+    ) {
+        var channelBuilder = io.grpc.ManagedChannelBuilder
+            .forAddress(host, port)
+            .maxInboundMessageSize(50 * 1024 * 1024);
+
+        if (!useTls) {
+            channelBuilder.usePlaintext();
+        }
+
+        return new QdrantClient(
+            io.qdrant.client.QdrantGrpcClient.newBuilder(channelBuilder.build()).build()
+        );
+    }
 
     @Bean
     public ChatClient chatClient(ChatModel chatModel) {

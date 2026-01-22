@@ -48,6 +48,7 @@ allprojects {
         implementation 'org.springframework.ai:spring-ai-qdrant-store'
         implementation 'org.springframework.ai:spring-ai-advisors-vector-store'
         implementation 'org.springframework.ai:spring-ai-starter-model-ollama'
+        implementation 'io.grpc:grpc-netty:1.65.1'
         implementation 'org.springframework.ai:spring-ai-starter-vector-store-qdrant'
         implementation "me.paulschwarz:spring-dotenv:${springDotenvVersion}"
 
