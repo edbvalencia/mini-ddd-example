@@ -72,4 +72,12 @@ public class RawSegmentationPublicationSearcher {
         return mongo.count(query, RawMention.class, "segmentation");
     }
 
+    public List<RawMention> searchByIds(List<String> ids) {
+        if (ids.isEmpty()) {
+            return List.of();
+        }
+        Query query = new Query(Criteria.where("_id").in(ids));
+        return mongo.find(query, RawMention.class, "segmentation");
+    }
+
 }
